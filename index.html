@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能垃圾分类系统</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .search-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    .search-box {
+      display: flex;
+      max-width: 600px;
+      margin: 0 auto;
+      border-radius: 50px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 15px 20px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+    
+    .search-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .search-button:hover {
+      background-color: #45a049;
+    }
+    
+    .result-container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .result-title {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .result-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    
+    .result-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    
+    .result-type {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .result-description {
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .category-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .category-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .category-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .recyclable { color: #2196F3; }
+    .hazardous { color: #F44336; }
+    .kitchen { color: #FF9800; }
+    .other { color: #9E9E9E; }
+    
+    .category-icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+    }
+    
+    .category-title {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .category-examples {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="module">
+    // 垃圾分类数据
+    const garbageData = {
+      // 可回收垃圾
+      recyclable: {
+        name: "可回收垃圾",
+        icon: "fas fa-recycle",
+        color: "#2196F3",
+        description: "可回收垃圾是指适宜回收利用和资源化利用的生活垃圾，主要包括纸类、塑料、金属、玻璃、织物等。",
+        examples: ["纸板箱", "报纸", "塑料瓶", "玻璃瓶", "金属罐", "衣物", "书本", "卫生纸筒"],
+        items: [
+          { name: "纸板箱", category: "recyclable" },
+          { name: "报纸", category: "recyclable" },
+          { name: "杂志", category: "recyclable" },
+          { name: "纸袋", category: "recyclable" },
+          { name: "塑料瓶", category: "recyclable" },
+          { name: "塑料玩具", category: "recyclable" },
+          { name: "塑料盒", category: "recyclable" },
+          { name: "矿泉水瓶", category: "recyclable" },
+          { name: "饮料瓶", category: "recyclable" },
+          { name: "玻璃瓶", category: "recyclable" },
+          { name: "玻璃杯", category: "recyclable" },
+          { name: "金属罐", category: "recyclable" },
+          { name: "易拉罐", category: "recyclable" },
+          { name: "铁罐", category: "recyclable" },
+          { name: "铝箔", category: "recyclable" },
+          { name: "旧衣物", category: "recyclable" },
+          { name: "布料", category: "recyclable" },
+          { name: "旧书本", category: "recyclable" },
+          { name: "纸质包装", category: "recyclable" },
+          { name: "卫生纸筒", category: "recyclable" },
+          { name: "牛奶盒", category: "recyclable" },
+          { name: "卫生纸", category: "recyclable" }
+        ]
+      },
+      
+      // 有害垃圾
+      hazardous: {
+        name: "有害垃圾",
+        icon: "fas fa-skull-crossbones",
+        color: "#F44336",
+        description: "有害垃圾是指对人体健康或自然环境造成直接或潜在危害的生活垃圾，主要包括废电池、废灯管、废药品、废油漆及其容器等。",
+        examples: ["废电池", "废荧光灯管", "过期药品", "废油漆桶", "废杀虫剂瓶"],
+        items: [
+          { name: "废电池", category: "hazardous" },
+          { name: "充电电池", category: "hazardous" },
+          { name: "纽扣电池", category: "hazardous" },
+          { name: "蓄电池", category: "hazardous" },
+          { name: "废荧光灯管", category: "hazardous" },
+          { name: "节能灯", category: "hazardous" },
+          { name: "灯泡", category: "hazardous" },
+          { name: "过期药品", category: "hazardous" },
+          { name: "药片", category: "hazardous" },
+          { name: "药水", category: "hazardous" },
+          { name: "药膏", category: "hazardous" },
+          { name: "废油漆桶", category: "hazardous" },
+          { name: "染发剂", category: "hazardous" },
+          { name: "废杀虫剂瓶", category: "hazardous" },
+          { name: "消毒剂", category: "hazardous" },
+          { name: "废水银温度计", category: "hazardous" },
+          { name: "废墨盒", category: "hazardous" },
+          { name: "废打印机墨盒", category: "hazardous" },
+          { name: "废胶片", category: "hazardous" },
+          { name: "废指甲油", category: "hazardous" }
+        ]
+      },
+      
+      // 厨余垃圾
+      kitchen: {
+        name: "厨余垃圾",
+        icon: "fas fa-apple-alt",
+        color: "#FF9800",
+        description: "厨余垃圾是指日常生活中产生的食物残余和食品加工废料等易腐烂的生活垃圾。",
+        examples: ["剩菜剩饭", "果皮", "蔬菜", "茶叶渣", "骨头"],
+        items: [
+          { name: "剩菜剩饭", category: "kitchen" },
+          { name: "米饭", category: "kitchen" },
+          { name: "面条", category: "kitchen" },
+          { name: "饼干", category: "kitchen" },
+          { name: "面包", category: "kitchen" },
+          { name: "糕点", category: "kitchen" },
+          { name: "果皮", category: "kitchen" },
+          { name: "水果皮", category: "kitchen" },
+          { name: "果核", category: "kitchen" },
+          { name: "苹果核", category: "kitchen" },
+          { name: "蔬菜", category: "kitchen" },
+          { name: "蔬菜叶", category: "kitchen" },
+          { name: "菜叶", category: "kitchen" },
+          { name: "茶叶渣", category: "kitchen" },
+          { name: "咖啡渣", category: "kitchen" },
+          { name: "骨头", category: "kitchen" },
+          { name: "鱼骨", category: "kitchen" },
+          { name: "肉类", category: "kitchen" },
+          { name: "蛋壳", category: "kitchen" },
+          { name: "坚果壳", category: "kitchen" },
+          { name: "贝壳", category: "kitchen" }
+        ]
+      },
+      
+      // 其他垃圾
+      other: {
+        name: "其他垃圾",
+        icon: "fas fa-trash-alt",
+        color: "#9E9E9E",
+        description: "其他垃圾是指除可回收垃圾、有害垃圾、厨余垃圾以外的其他生活垃圾。",
+        examples: ["餐巾纸", "卫生纸", "尿不湿", "烟头", "陶瓷碎片"],
+        items: [
+          { name: "餐巾纸", category: "other" },
+          { name: "纸巾", category: "other" },
+          { name: "湿纸巾", category: "other" },
+          { name: "尿不湿", category: "other" },
+          { name: "纸尿裤", category: "other" },
+          { name: "卫生巾", category: "other" },
+          { name: "烟头", category: "other" },
+          { name: "香烟", category: "other" },
+          { name: "陶瓷碎片", category: "other" },
+          { name: "陶瓷杯", category: "other" },
+          { name: "花盆", category: "other" },
+          { name: "砖瓦", category: "other" },
+          { name: "灰土", category: "other" },
+          { name: "污损纸张", category: "other" },
+          { name: "大骨头", category: "other" },
+          { name: "贝壳", category: "other" },
+          { name: "毛发", category: "other" },
+          { name: "橡皮泥", category: "other" },
+          { name: "一次性筷子", category: "other" },
+          { name: "牙签", category: "other" }
+        ]
+      }
+    };
+    
+    // 创建一个平铺的列表，用于搜索
+    const searchableItems = [];
+    Object.keys(garbageData).forEach(categoryKey => {
+      const category = garbageData[categoryKey];
+      category.items.forEach(item => {
+        searchableItems.push({
+          name: item.name,
+          category: item.category,
+          categoryInfo: garbageData[item.category]
+        });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const root = document.getElementById('root');
+      renderApp(root);
+    });
+
+    function renderApp(container) {
+      // Create app structure
+      container.innerHTML = `
+        <div class="container">
+          <header>
+            <h1>智能垃圾分类系统</h1>
+            <p>了解垃圾分类，保护环境从我做起</p>
+          </header>
+          
+          <div class="search-container">
+            <div class="search-box">
+              <input type="text" class="search-input" placeholder="请输入垃圾名称，例如: 卫生纸、塑料瓶..." id="searchInput">
+              <button class="search-button" id="searchButton">
+                <i class="fas fa-search"></i> 查询
+              </button>
+            </div>
+          </div>
+          
+          <div class="result-container" id="resultContainer" style="display: none;">
+            <h2 class="result-title">查询结果</h2>
+            <div class="result-content" id="resultContent"></div>
+          </div>
+          
+          <div class="category-container">
+            ${renderCategoryCards()}
+          </div>
+          
+          <footer>
+            <p>© 2025 智能垃圾分类系统 - 保护环境，从垃圾分类开始</p>
+          </footer>
+        </div>
+      `;
+      
+      // Add event listeners
+      document.getElementById('searchButton').addEventListener('click', handleSearch);
+      document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleSearch();
+        }
+      });
+    }
+
+    function renderCategoryCards() {
+      return Object.keys(garbageData).map(key => {
+        const category = garbageData[key];
+        return `
+          <div class="category-card">
+            <div class="category-icon ${key}">
+              <i class="${category.icon}"></i>
+            </div>
+            <h3 class="category-title">${category.name}</h3>
+            <p>${category.description}</p>
+            <p class="category-examples">
+              <strong>例如:</strong> ${category.examples.join('、')}
+            </p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleSearch() {
+      const searchInput = document.getElementById('searchInput');
+      const query = searchInput.value.trim();
+      
+      if (!query) {
+        alert('请输入垃圾名称');
+        return;
+      }
+      
+      const result = searchGarbage(query);
+      displaySearchResult(result);
+    }
+
+    function searchGarbage(query) {
+      // 首先尝试精确匹配
+      const exactMatch = searchableItems.find(item => 
+        item.name === query
+      );
+      
+      if (exactMatch) {
+        return exactMatch;
+      }
+      
+      // 如果没有精确匹配，尝试包含匹配
+      const containsMatch = searchableItems.find(item => 
+        item.name.includes(query) || query.includes(item.name)
+      );
+      
+      if (containsMatch) {
+        return containsMatch;
+      }
+      
+      // 无匹配结果
+      return null;
+    }
+
+    function displaySearchResult(result) {
+      const resultContainer = document.getElementById('resultContainer');
+      const resultContent = document.getElementById('resultContent');
+      
+      resultContainer.style.display = 'block';
+      
+      if (!result) {
+        resultContent.innerHTML = `
+          <div class="no-result">
+            <i class="fas fa-exclamation-circle" style="font-size: 50px; color: #F44336; margin-bottom: 20px;"></i>
+            <h3>未找到相关结果</h3>
+            <p>抱歉，没有找到与您搜索内容相匹配的垃圾分类信息。</p>
+            <p>您可以尝试使用其他关键词，或查看下方垃圾分类指南。</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const categoryInfo = result.categoryInfo;
+      
+      resultContent.innerHTML = `
+        <div class="result-icon ${result.category}">
+          <i class="${categoryInfo.icon}"></i>
+        </div>
+        <div class="result-type ${result.category}">${categoryInfo.name}</div>
+        <h3>"${result.name}" 属于 ${categoryInfo.name}</h3>
+        <p class="result-description">${categoryInfo.description}</p>
+        <div style="margin-top: 20px;">
+          <strong>该类别的其他例子:</strong> ${categoryInfo.examples.join('、')}
+        </div>
+      `;
+      
+      // 滚动到结果区域
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html> 
